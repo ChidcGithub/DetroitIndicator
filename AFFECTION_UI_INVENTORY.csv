@@ -1,0 +1,20 @@
+﻿role,path,archive_type,archive_id,index,bigfile,offset,size,notes
+Main Scaleform GFX bundle,extract/ui/143991_t18002_id193_f11.bin,18002,193,143991,11,1192593408,67478,contains GLOBAL_GAUGE_BENDING.gfx at 0x172
+Variant GFX bundle,extract/ui/317102_t18002_id214_f20.bin,18002,214,317102,20,1886255104,66455,contains GLOBAL_BENDING_NOTOTO.gfx at 0x174
+Scene/resource container,extract/ui/143769_t4288_id7720_f11.bin,4288,7720,143769,11,1157957632,609885,JaugeBending - Alias at 0x921B3; JaugeBending at 0x94A45
+Scene/resource container,extract/ui/143995_t4288_id7725_f11.bin,4288,7725,143995,11,1192685568,188524,JaugeBending - Alias at 0x25B6F; JaugeBending at 0x2DC54
+UI templates (Jauge / UI Jauge),extract/ui/000305_t19000_id6826_f0.bin,19000,6826,305,0,2453504,454644,QZIP; templates + all 4 HUD UUIDs
+UI data (GD Jauge Priority / Flowchart Setup),extract/ui/000314_t19000_id7085_f0.bin,19000,7085,314,0,3237888,161880,QZIP; 60 GUI_GAUGE strings
+Localization (25 languages),extract/type1016/001313_t1016_id2279_f0.bin,1016,2279,1313,0,85788672,274411,68 GUI_GAUGE_* keys per language
+Lua game-mode bank,extract/luac_gm/371478_t63_id635_f24_0x678E1_9e4624a2d820efabJauge.lua,63,635,371478,24,2127671296,1544185,Jauge template UUID 9876c315-b0ac-4ded-b644-6788cd6c60a5
+Lua game-mode bank,extract/luac_gm/371478_t63_id635_f24_0x68A74_e489d39d21174b6eUI Jauge.lua,63,635,371478,24,2127671296,1544185,UI Jauge template UUID 4e9b0795-9915-4e78-bedd-233bda4d3a6c
+Lua game-data bank,extract/luac_gd/371482_t63_id859_f24_0xF6BAB_9494ac0ff3da2456GD Jauge Priority.lua,63,859,371482,24,2130120704,1437929,GD Jauge Priority UUID b1a34902-390d-478b-a5fb-008e28dfe4fc
+Lua game-data bank,extract/luac_gd/371482_t63_id859_f24_0x1190EF_83cc2b3a63ab7f5aGD Jauge Flowchart Setup.lua,63,859,371482,24,2130120704,1437929,"chart presentation, not HUD meter"
+Carved GFX,extract/GLOBAL_GAUGE_BENDING.gfx,,,,,,65463,"1920x1080, 30fps, 1 frame, GFX version 0x15"
+Carved ABC,extract/GLOBAL_GAUGE_BENDING.abc,,,,,,64823,DoABC 0x209 len 64828
+Carved GFX,extract/GLOBAL_BENDING_NOTOTO.gfx,,,,,,64438,variant
+Carved ABC,extract/GLOBAL_BENDING_NOTOTO.abc,,,,,,63796,variant
+Texture,extract/Success_Arrow.dds,,,,,,16512,zlib at 0x10146; 128x128
+Texture,extract/Lock_part2.dds,,,,,,16512,zlib at 0x10360; 128x128
+Texture,extract/Lock_part1.dds,,,,,,16512,zlib at 0x1049F; 128x128
+Localization export,extract/gauge_localization_keys.tsv,,,,,,2290,68 English keys

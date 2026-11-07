@@ -1,0 +1,443 @@
+<Window x:Class="AffectionIndicator.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Affection Indicator"
+        Width="980" Height="680"
+        MinWidth="840" MinHeight="560"
+        WindowStartupLocation="CenterScreen"
+        Icon="/Assets/AppIcon.ico"
+        Background="#F2F2F7"
+        FontFamily="Segoe UI Variable Text, Segoe UI"
+        Foreground="#1D1D1F">
+    <Window.Resources>
+        <SolidColorBrush x:Key="AccentBrush" Color="#007AFF"/>
+        <SolidColorBrush x:Key="MutedBrush" Color="#6E6E73"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <SolidColorBrush x:Key="HairlineBrush" Color="#E5E5EA"/>
+
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+            <Setter Property="CornerRadius" Value="14"/>
+            <Setter Property="Padding" Value="20"/>
+            <Setter Property="Margin" Value="0,0,0,14"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="18" ShadowDepth="0" Opacity="0.06" Color="#000000"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Title" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="22"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style x:Key="Subtitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12.5"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="SectionTitle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,12"/>
+        </Style>
+
+        <Style x:Key="RowLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="RowHint" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11.5"/>
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}"/>
+            <Setter Property="Margin" Value="0,3,0,0"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <Style x:Key="Switch" TargetType="CheckBox">
+            <Setter Property="Width" Value="44"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Width="44" Height="26">
+                            <Border x:Name="Track" CornerRadius="13" Background="#E5E5EA"/>
+                            <Border x:Name="Thumb" Width="22" Height="22" CornerRadius="11"
+                                    Background="White" HorizontalAlignment="Left" Margin="2">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="5" ShadowDepth="1" Opacity="0.18" Color="Black"/>
+                                </Border.Effect>
+                            </Border>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="#34C759"/>
+                                <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Track" Property="Opacity" Value="0.45"/>
+                                <Setter TargetName="Thumb" Property="Opacity" Value="0.7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="16,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.88"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.75"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="Background" Value="#EFEFF4"/>
+            <Setter Property="Foreground" Value="#1D1D1F"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd" Background="{TemplateBinding Background}" CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E5E5EA"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#DADAE0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="NavItem" TargetType="ListBoxItem">
+            <Setter Property="Padding" Value="12,9"/>
+            <Setter Property="Margin" Value="0,1"/>
+            <Setter Property="FontSize" Value="13.5"/>
+            <Setter Property="Foreground" Value="#1D1D1F"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="Bd" Background="Transparent" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#E8E8F0"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#DCEBFF"/>
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="FontWeight" Value="SemiBold"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="Combo" TargetType="ComboBox">
+            <Setter Property="Height" Value="32"/>
+            <Setter Property="MinWidth" Value="160"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="FontSize" Value="13"/>
+        </Style>
+
+        <Style x:Key="SliderStyle" TargetType="Slider">
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Maximum" Value="100"/>
+            <Setter Property="Width" Value="210"/>
+        </Style>
+
+        <Style x:Key="StateButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Margin" Value="0,0,8,8"/>
+            <Setter Property="MinWidth" Value="130"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="232"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="#ECECF2" Padding="18,26">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Margin="4,0,4,24">
+                    <TextBlock Text="Affection" FontSize="22" FontWeight="Bold"/>
+                    <TextBlock Text="Indicator" FontSize="22" FontWeight="Bold" Foreground="{StaticResource AccentBrush}"/>
+                    <TextBlock Text="Detroit gauge overlay" FontSize="11.5" Foreground="{StaticResource MutedBrush}" Margin="0,8,0,0"/>
+                </StackPanel>
+
+                <ListBox x:Name="NavList" DockPanel.Dock="Top" Background="Transparent" BorderThickness="0"
+                         ItemContainerStyle="{StaticResource NavItem}" SelectionChanged="NavList_OnSelectionChanged">
+                    <ListBoxItem Content="General"/>
+                    <ListBoxItem Content="Appearance"/>
+                    <ListBoxItem Content="Network"/>
+                    <ListBoxItem Content="About"/>
+                </ListBox>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="4,0">
+                    <TextBlock x:Name="SidebarStatus" Text="Overlay hidden" FontSize="11"
+                               Foreground="{StaticResource MutedBrush}" TextWrapping="Wrap"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" Padding="32,26,32,26">
+            <Grid>
+                <StackPanel x:Name="GeneralPage">
+                    <TextBlock Text="General" Style="{StaticResource Title}"/>
+                    <TextBlock Text="Choose how the indicator behaves on your desktop." Style="{StaticResource Subtitle}" Margin="0,0,0,20"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="WINDOW" Style="{StaticResource SectionTitle}"/>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Always on top" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Keep the indicator above normal windows when it appears." Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="AlwaysOnTopToggle" Grid.Column="1" Style="{StaticResource Switch}" Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Click-through" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Let clicks pass through the gauge. Turn off to drag it into place." Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="ClickThroughToggle" Grid.Column="1" Style="{StaticResource Switch}" Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Start with Windows" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Launch the tray app automatically at sign-in." Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="AutoStartToggle" Grid.Column="1" Style="{StaticResource Switch}" Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="MANUAL PREVIEW" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Switch the indicator state without changing any game data." Style="{StaticResource RowHint}" Margin="0,0,0,12"/>
+                            <WrapPanel>
+                                <Button Content="Neutral" Tag="None" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Small increase" Tag="Increase" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Small decrease" Tag="Decrease" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Big increase" Tag="IncreasePlus" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Big decrease" Tag="DecreasePlus" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Path unlocked" Tag="Unlocked" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                                <Button Content="Path locked" Tag="Locked" Style="{StaticResource StateButton}" Click="Preview_OnClick"/>
+                            </WrapPanel>
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Preview name / adjective" Style="{StaticResource RowLabel}"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                        <TextBox x:Name="NameBox" Width="150" Height="30" Padding="8,4" FontSize="13"/>
+                                        <TextBox x:Name="AdjectiveBox" Width="150" Height="30" Padding="8,4" FontSize="13" Margin="8,0,0,0"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Preview" Style="{StaticResource PrimaryButton}" VerticalAlignment="Bottom" Click="PreviewText_OnClick"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel x:Name="AppearancePage" Visibility="Collapsed">
+                    <TextBlock Text="Appearance" Style="{StaticResource Title}"/>
+                    <TextBlock Text="Place the gauge exactly where you want it. Changes apply immediately." Style="{StaticResource Subtitle}" Margin="0,0,0,20"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="POSITION" Style="{StaticResource SectionTitle}"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Anchor" Style="{StaticResource RowLabel}"/>
+                                <ComboBox x:Name="AnchorCombo" Grid.Column="1" Style="{StaticResource Combo}" SelectionChanged="Anchor_OnSelectionChanged">
+                                    <ComboBoxItem Content="Top right" Tag="TopRight"/>
+                                    <ComboBoxItem Content="Top left" Tag="TopLeft"/>
+                                    <ComboBoxItem Content="Top center" Tag="TopCenter"/>
+                                    <ComboBoxItem Content="Center" Tag="Center"/>
+                                    <ComboBoxItem Content="Bottom right" Tag="BottomRight"/>
+                                    <ComboBoxItem Content="Bottom left" Tag="BottomLeft"/>
+                                    <ComboBoxItem Content="Custom" Tag="Custom"/>
+                                </ComboBox>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Horizontal offset" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="OffsetXSlider" Style="{StaticResource SliderStyle}" Minimum="-2000" Maximum="2000" ValueChanged="Offset_OnValueChanged"/>
+                                    <TextBlock x:Name="OffsetXLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Vertical offset" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="OffsetYSlider" Style="{StaticResource SliderStyle}" Minimum="-2000" Maximum="2000" ValueChanged="Offset_OnValueChanged"/>
+                                    <TextBlock x:Name="OffsetYLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Scale" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="ScaleSlider" Style="{StaticResource SliderStyle}" Minimum="0.7" Maximum="1.6" ValueChanged="Scale_OnValueChanged"/>
+                                    <TextBlock x:Name="ScaleLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel>
+                                <Button Content="Reset position" Style="{StaticResource SecondaryButton}" Click="ResetPosition_OnClick"/>
+                                <Button Content="Show preview" Style="{StaticResource PrimaryButton}" Margin="8,0,0,0" Click="PreviewText_OnClick"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="NAME POSITION" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Move the character name independently of the gauge backdrop."
+                                       Style="{StaticResource RowHint}" Margin="0,0,0,12"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Horizontal" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="NameOffsetXSlider" Style="{StaticResource SliderStyle}" Minimum="-300" Maximum="300" ValueChanged="NameOffset_OnValueChanged"/>
+                                    <TextBlock x:Name="NameOffsetXLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Vertical" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="NameOffsetYSlider" Style="{StaticResource SliderStyle}" Minimum="-100" Maximum="100" ValueChanged="NameOffset_OnValueChanged"/>
+                                    <TextBlock x:Name="NameOffsetYLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel>
+                                <Button Content="Reset name" Style="{StaticResource SecondaryButton}" Click="ResetName_OnClick"/>
+                                <Button Content="Preview name" Style="{StaticResource PrimaryButton}" Margin="8,0,0,0" Click="PreviewName_OnClick"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="TIP" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Turn off Click-through in General, then drag the gauge directly with the mouse. Its position is saved automatically."
+                                       Style="{StaticResource RowHint}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel x:Name="NetworkPage" Visibility="Collapsed">
+                    <TextBlock Text="Network" Style="{StaticResource Title}"/>
+                    <TextBlock Text="Basic connectivity switching and a localhost control channel." Style="{StaticResource Subtitle}" Margin="0,0,0,20"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="CONNECTION" Style="{StaticResource SectionTitle}"/>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse x:Name="NetworkDot" Width="9" Height="9" Fill="#FF3B30" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="NetworkStatusText" Text="Offline" Style="{StaticResource RowLabel}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Recheck" Style="{StaticResource SecondaryButton}" Click="RecheckNetwork_OnClick"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Auto-switch on network change" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Show an increase when the network comes online and a decrease when it drops." Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="NetworkAutoToggle" Grid.Column="1" Style="{StaticResource Switch}" Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="LOCALHOST CONTROL" Style="{StaticResource SectionTitle}"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="TCP control server" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Accepts one command per line on 127.0.0.1. Commands: inc, inc+, dec, dec+, unlock, lock, neutral, show, hide." Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <CheckBox x:Name="ServerToggle" Grid.Column="1" Style="{StaticResource Switch}" Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Port" Style="{StaticResource RowLabel}"/>
+                                <TextBox x:Name="PortBox" Grid.Column="1" Width="100" Height="30" Padding="8,4" FontSize="13" LostFocus="Port_OnLostFocus"/>
+                            </Grid>
+                            <TextBlock x:Name="ServerStatusText" Text="Server stopped" Style="{StaticResource RowHint}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel x:Name="AboutPage" Visibility="Collapsed">
+                    <TextBlock Text="About" Style="{StaticResource Title}"/>
+                    <TextBlock Text="A desktop port of the Detroit: Become Human relationship gauge." Style="{StaticResource Subtitle}" Margin="0,0,0,20"/>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="RELATIONSHIP GAUGE" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Geometry, timing and textures are taken from the extracted GLOBAL_GAUGE_BENDING Scaleform bundle. The gauge is a one-shot notification, not a persistent meter." TextWrapping="Wrap" FontSize="13" LineHeight="20"/>
+                            <TextBlock Text="Desktop port 1.0 · .NET 9 · WPF" Margin="0,12,0,0" FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="Settings: %APPDATA%\AffectionIndicator\settings.json" Margin="0,4,0,0" FontSize="12" Foreground="{StaticResource MutedBrush}"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="QUICK CONTROLS" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="• Double-click the tray icon to open Settings." TextWrapping="Wrap" FontSize="13" LineHeight="22"/>
+                            <TextBlock Text="• Use the preview buttons on General, or the tray Preview state menu." TextWrapping="Wrap" FontSize="13" LineHeight="22"/>
+                            <TextBlock Text="• Turn off Click-through, then drag the gauge to move it." TextWrapping="Wrap" FontSize="13" LineHeight="22"/>
+                            <TextBlock Text="• The localhost TCP control server accepts one command per line." TextWrapping="Wrap" FontSize="13" LineHeight="22"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Grid>
+</Window>

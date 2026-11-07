@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Relationship gauge — GLOBAL_GAUGE_BENDING reconstruction</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <p class="eyebrow">Detroit: Become Human · Scaleform UI</p>
+      <h1>Relationship gauge, frame by frame</h1>
+      <p class="lede">
+        A browser reconstruction of the <code>GLOBAL_GAUGE_BENDING</code> notification
+        from the decompiled gauge ActionScript, the extracted GFX vector geometry,
+        and the two padlock textures from the game archive.
+      </p>
+      <p class="provenance">
+        Geometry, timing and state constants are taken from
+        <code>extract/abc_src/32_GLOBAL_GAUGE_BENDING.as</code>,
+        <code>23_BendingState.as</code>, <code>24_AdjectiveInsert.as</code>,
+        <code>26_TriangleBG.as</code>, <code>27_FourTrianglesAccordion.as</code> and
+        <code>28_Unlock.as</code>. Textures: <code>Lock_part1.dds</code>,
+        <code>Lock_part2.dds</code>, converted to PNG from the bundle's zlib streams.
+      </p>
+    </header>
+
+    <main class="layout">
+      <section class="viewer-card" aria-label="Gauge animation">
+        <div class="viewer-head">
+          <span class="dot"></span>
+          <span>Gauge camera · zoom <span id="zoomLabel">2.00</span>×</span>
+          <span class="view-buttons">
+            <button id="fitView" class="view-btn" type="button">Fit</button>
+            <button id="resetView" class="view-btn" type="button">Reset</button>
+          </span>
+          <span class="viewer-tag">scroll / drag</span>
+        </div>
+        <div class="stage-wrap">
+          <canvas id="stage" width="1880" height="880" tabindex="0" aria-label="Relationship gauge stage, scroll to zoom and drag to pan"></canvas>
+        </div>
+        <div class="viewer-foot">
+          <div class="foot-meta">
+            <span>wheel = zoom at cursor</span>
+            <span>drag = pan</span>
+            <span>double-click = reset</span>
+          </div>
+          <div class="map-box">
+            <div class="map-caption">stage + bleed · white box = view</div>
+            <canvas id="map" class="map" width="560" height="315"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <aside class="panel">
+        <h2>Trigger a state</h2>
+        <div class="state-grid" id="stateGrid">
+          <button class="state-btn" data-state="-1">
+            <span class="swatch neutral"></span>
+            <span class="state-name">Neutral</span>
+            <span class="state-code">−1</span>
+          </button>
+          <button class="state-btn" data-state="0">
+            <span class="swatch blue"></span>
+            <span class="state-name">Small increase</span>
+            <span class="state-code">0</span>
+          </button>
+          <button class="state-btn" data-state="1">
+            <span class="swatch red"></span>
+            <span class="state-name">Small decrease</span>
+            <span class="state-code">1</span>
+          </button>
+          <button class="state-btn" data-state="4">
+            <span class="swatch blue"></span>
+            <span class="state-name">Big increase</span>
+            <span class="state-code">4</span>
+          </button>
+          <button class="state-btn" data-state="5">
+            <span class="swatch red"></span>
+            <span class="state-name">Big decrease</span>
+            <span class="state-code">5</span>
+          </button>
+          <button class="state-btn" data-state="2">
+            <span class="swatch blue"></span>
+            <span class="state-name">Path unlocked</span>
+            <span class="state-code">2</span>
+          </button>
+          <button class="state-btn" data-state="3">
+            <span class="swatch red"></span>
+            <span class="state-name">Path locked</span>
+            <span class="state-code">3</span>
+          </button>
+        </div>
+
+        <h2 class="second">Game text</h2>
+        <label class="field">
+          <span>Name / adjective (localized strings)</span>
+          <select id="textPreset"></select>
+        </label>
+
+        <div class="controls-row">
+          <button id="replay" class="primary">Replay</button>
+          <button id="pause" class="ghost">Pause</button>
+          <label class="field compact">
+            <span>Speed</span>
+            <select id="speed">
+              <option value="1">1×</option>
+              <option value="0.5">0.5×</option>
+              <option value="0.25">0.25×</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="timeline">
+          <span>Timeline</span>
+          <input id="scrub" type="range" min="0" max="2.4" step="0.01" value="0" />
+        </label>
+
+        <div class="readout" id="readout">
+          <div><span>state</span><b id="roState">0 · INCREASE</b></div>
+          <div><span>sound event</span><b id="roSound">UI_Sound_Gauge_Increase_Small</b></div>
+          <div><span>elapsed</span><b id="roTime">0.00 s</b></div>
+          <div><span>phase</span><b id="roPhase">reveal</b></div>
+        </div>
+      </aside>
+    </main>
+
+    <section class="notes">
+      <div class="note">
+        <h3>What is exact</h3>
+        <ul>
+          <li>1920 × 1080 stage, <code>safeY = −42</code>; the strip is 346 × 150 with four 173 × 150 triangles.</li>
+          <li>Name right edge 1862, adjective insert at y = 56, state anchor at (1902, 34), padlock centre (1886, 124).</li>
+          <li>30 fps frame strobes, 8-frame adjective flicker, 1500 ms hold, 500 ms fade; 1000 ms <code>Quint.easeOut</code> chevrons and <code>Strong.easeOut</code> padlock halves.</li>
+          <li>The 64 × 96 arrow is the GFX pentagon <code>(0,32) (−32,0) (−32,64) (0,96) (32,64) (32,0)</code>, used twice as artwork and as its own moving mask.</li>
+          <li>The main canvas shows the complete group, including its 42 px top bleed and 22 px right bleed. The map shows the original 1920 × 1080 position.</li>
+        </ul>
+      </div>
+      <div class="note">
+        <h3>What is deliberately not faked</h3>
+        <ul>
+          <li>The background is not a texture. It is drawn from the AS3 triangle coordinates; the only bitmaps are the two padlock halves (and the unused success chevron).</li>
+          <li>No sound is played: the gauge dispatches named Scaleform events, but the audio bank was not located. The event name is shown instead.</li>
+          <li>The shared <code>fonts/FONT_MASTER_ENG.swf</code> is external to the gauge bundle and is not in the extracted data, so text is rasterized with Bahnschrift / Arial Narrow at the decoded sizes with 10 px tracking to match the shipped font's spacing. The wording itself comes from the extracted localization table.</li>
+          <li>Positive/UNLOCKED blue is <code>#80EEFF</code>, the shipped UI-GFX blue. The shared <code>QDColor.BLUE</code> literal is <code>#FCA2FF</code> and does not match the shipped gauge, so it is not used. Negative red is <code>QDColor.RED = #FF3000</code>.</li>
+          <li>The <code>LOCKED</code> state uses the same <code>$GUI_GAUGE_UNLOCK</code> caption and unlock pose in the decompiled class; only the plate tint and sound event differ. The demo keeps that quirk.</li>
+        </ul>
+      </div>
+    </section>
+
+    <footer>
+      <span>Source bundle: <code>143991_t18002_id193_f11.bin</code> → <code>GLOBAL_GAUGE_BENDING.gfx</code></span>
+      <span class="muted">Reconstruction, not a game capture.</span>
+    </footer>
+  </div>
+
+  <script src="gauge.js"></script>
+</body>
+</html>

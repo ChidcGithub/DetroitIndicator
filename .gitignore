@@ -1,0 +1,13 @@
+# Build output
+AffectionIndicator/bin/
+AffectionIndicator/obj/
+
+# Local development artifacts
+tmp/
+extract/
+tools/
+
+# IDE / user files
+.vs/
+*.user
+*.suo
