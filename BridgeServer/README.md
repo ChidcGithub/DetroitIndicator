@@ -47,8 +47,8 @@ Allowed commands: `inc`, `increase`, `dec`, `decrease`, `inc+`, `increaseplus`,
 
 The command request can also include optional `name` and `adjective` fields
 (up to 32 characters each). The bridge sends `name:...` and `adj:...` to the
-desktop before the state command, letting the Wear custom button or any API
-client send a complete custom state in one request.
+desktop before the state, so the desktop's displayed name/adjective update and
+persist for later states.
 
 ### Register with PowerShell
 

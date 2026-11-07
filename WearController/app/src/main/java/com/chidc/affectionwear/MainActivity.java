@@ -66,6 +66,11 @@ public class MainActivity extends Activity {
         customButton = findViewById(R.id.btn_custom);
         statusText = findViewById(R.id.status_text);
 
+        deviceId.setSelectAllOnFocus(true);
+        bridgeUrl.setSelectAllOnFocus(true);
+        presetName.setSelectAllOnFocus(true);
+        presetAdjective.setSelectAllOnFocus(true);
+
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         deviceId.setText(prefs.getString(KEY_ID, ""));
         bridgeUrl.setText(prefs.getString(KEY_URL, DEFAULT_URL));

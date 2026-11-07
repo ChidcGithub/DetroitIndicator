@@ -62,7 +62,9 @@ The saved custom button and resulting desktop state:
 To create one, open the watch app, scroll to **Custom button**, enter a name
 and adjective, pick a state, and tap **Save custom button**. The saved button
 appears above the standard controls; tapping it sends the state and both text
-values together through the bridge.
+values together through the bridge. The custom name/adjective become the
+desktop's current name/adjective, so the overlay shows them and later states
+continue to use them until changed.
 
 ## Requirements
 

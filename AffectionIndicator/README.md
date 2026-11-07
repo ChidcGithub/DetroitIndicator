@@ -116,7 +116,8 @@ from that server. The WebSocket scheme is derived (`ws`/`wss`).
 
 Bridge command requests may include optional `name` and `adjective` fields;
 the bridge sends `name:...` and `adj:...` before the state. The Wear app uses
-this for its saved custom button.
+this for its saved custom button, so the desktop's name/adjective update and
+persist for later states.
 
 ## Localhost control protocol
 

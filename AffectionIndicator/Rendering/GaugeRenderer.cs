@@ -176,7 +176,9 @@ public sealed class GaugeRenderer
         if (alpha <= 0)
             return;
 
-        DrawTrackedText(dc, name, NameCenterX + offsetX, NameCenterY + offsetY, NameSize,
+        var size = FitTextSize(name, NameSize, 340, 28, FontWeights.Light,
+            NameTracking, dpi);
+        DrawTrackedText(dc, name, NameCenterX + offsetX, NameCenterY + offsetY, size,
             FontWeights.Light, White, NameTracking, TextAlign.Center, alpha * fade, dpi);
     }
 

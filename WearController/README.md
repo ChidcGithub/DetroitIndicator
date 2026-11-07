@@ -78,8 +78,8 @@ Small +
 ```
 
 Tapping it posts one command with the state plus the saved name and adjective.
-The bridge forwards `name:...`, `adj:...`, and the state to the desktop, so the
-overlay shows that character's text immediately.
+The bridge sends `name:...`, `adj:...`, then the state, so the desktop updates
+its displayed name/adjective and shows that character's text immediately.
 
 The fields are pre-filled from the saved preset; editing and saving again
 replaces the custom button.
