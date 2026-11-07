@@ -3,8 +3,9 @@
 A desktop port of the **Detroit: Become Human** relationship gauge
 (`GLOBAL_GAUGE_BENDING`) for Windows. The gauge is drawn as a transparent,
 always-on-top WPF overlay, with a tray app, an Apple-style settings window,
-auto-start, manual state previews, a localhost TCP control channel, and basic
-network-availability switching.
+auto-start, manual state previews, a localhost TCP control channel, basic
+network-availability switching, and bridge pairing for the web/Wear OS
+controllers.
 
 ![Gauge states](docs/states.png)
 
@@ -31,6 +32,9 @@ network-availability switching.
   gauge directly while click-through is off. The character name has its own
   horizontal/vertical offset controls in Appearance. Everything is persisted.
 - **Localhost control** – one command per line on `127.0.0.1:8765`.
+- **Bridge pairing** – on first launch, hashes the motherboard serial and
+  requests a device ID from the bridge website, then keeps a WebSocket open for
+  commands from the website or the Wear OS app.
 
 ## Requirements
 
@@ -69,6 +73,8 @@ The first launch opens Settings.
   the gauge directly. The new position is saved as a custom anchor.
 - **Network** – live online/offline status, network auto-switch, TCP server
   toggle, port and listening status.
+- **Bridge** – pairing status, the device ID (with **Copy**), bridge URL,
+  enable toggle, **Reconnect**, **Reset pairing**, and **Open bridge website**.
 - **About** – provenance, settings path and quick controls.
 
 Closing the settings window hides it; the app keeps running in the tray.
@@ -80,6 +86,33 @@ Settings are stored at:
 ```
 %APPDATA%\AffectionIndicator\settings.json
 ```
+
+## Bridge pairing
+
+The desktop pairs with the `BridgeServer` project in the repository root:
+
+```powershell
+dotnet run --project BridgeServer --urls http://0.0.0.0:5210
+```
+
+On first launch the desktop:
+
+1. reads the motherboard serial (`Win32_BaseBoard.SerialNumber`, falling back to
+   the system product UUID and then the machine name),
+2. hashes it with SHA-256 (the raw serial is never sent),
+3. requests a 10-character device ID from
+   `POST {BridgeUrl}/api/devices/register`,
+4. saves the ID and private token in `settings.json`, and
+5. opens a WebSocket to `/ws/device?id=...&token=...` and waits for commands.
+
+The same ID is used by the bridge website and the Wear OS app. The token stays
+on the desktop and authenticates the WebSocket. Registration is idempotent, so
+later launches reconnect with the stored pair; if the server data is reset, a
+new ID is issued and shown on the Bridge page.
+
+The default URL is `http://localhost:5210`. A remote bridge can be used by
+changing **Bridge URL**; the app clears the old pairing and requests a new ID
+from that server. The WebSocket scheme is derived (`ws`/`wss`).
 
 ## Localhost control protocol
 
@@ -154,6 +187,8 @@ AffectionIndicator/
     StartupService.cs        HKCU Run key
     NetworkMonitor.cs        interface availability monitor
     ControlServer.cs         localhost TCP command channel
+    MachineIdentity.cs       baseboard serial / UUID fingerprint hash
+    BridgeClientService.cs   registration, WebSocket receive loop, reconnect
     TrayService.cs           NotifyIcon and context menu
   Models/AppSettings.cs      persisted settings model
   Assets/                    extracted padlock textures
@@ -173,6 +208,11 @@ AffectionIndicator/
 - The source gauge is a one-shot notification; there is no persistent meter.
 - The control server binds to loopback only and has no authentication. Do not
   expose the port.
+- The bridge is designed for a trusted LAN. The website/watch authenticate with
+  the 10-character device ID, but the bridge has no TLS or user accounts; do
+  not expose port 5210 to the internet.
+- Bridge pairing requires `BridgeServer` to be running. If it is offline, the
+  desktop shows a waiting state and retries in the background.
 
 ## Provenance
 

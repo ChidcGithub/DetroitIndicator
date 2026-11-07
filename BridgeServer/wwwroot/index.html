@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detroit Indicator Bridge</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div class="mark" aria-hidden="true">
+        <span></span><span></span>
+      </div>
+      <div>
+        <p class="eyebrow">AFFECTION INDICATOR</p>
+        <h1>Bridge</h1>
+        <p class="tagline">Pair a desktop and control the relationship gauge from anywhere on your network.</p>
+      </div>
+    </header>
+
+    <section class="card pair-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">PAIRING</p>
+          <h2>Desktop ID</h2>
+        </div>
+        <div id="statusPill" class="status-pill status-idle">
+          <span class="dot"></span>
+          <span id="statusText">Not connected</span>
+        </div>
+      </div>
+
+      <p class="hint">Find the device ID in the desktop app under <strong>Settings → Bridge</strong>.</p>
+
+      <div class="pair-row">
+        <label class="sr-only" for="deviceId">Desktop device ID</label>
+        <input id="deviceId" type="text" inputmode="text" autocomplete="off"
+               spellcheck="false" maxlength="10" placeholder="e.g. A7K2M9QX4P">
+        <button id="connectButton" class="primary" type="button">Connect</button>
+      </div>
+      <p id="pairHint" class="hint small">The ID is saved in this browser for next time.</p>
+    </section>
+
+    <section class="card control-card">
+      <div class="card-heading">
+        <div>
+          <p class="eyebrow">CONTROLS</p>
+          <h2>Send a state</h2>
+        </div>
+        <span id="bridgeState" class="bridge-state">waiting</span>
+      </div>
+
+      <div class="control-grid" id="controlGrid">
+        <button type="button" data-command="inc"><span class="glyph up">↑</span><span>Small increase</span></button>
+        <button type="button" data-command="dec"><span class="glyph down">↓</span><span>Small decrease</span></button>
+        <button type="button" data-command="inc+"><span class="glyph up strong">⇈</span><span>Big increase</span></button>
+        <button type="button" data-command="dec+"><span class="glyph down strong">⇊</span><span>Big decrease</span></button>
+        <button type="button" data-command="unlock"><span class="glyph">◇</span><span>Path unlocked</span></button>
+        <button type="button" data-command="lock"><span class="glyph">◆</span><span>Path locked</span></button>
+        <button type="button" data-command="neutral"><span class="glyph">•</span><span>Name only</span></button>
+        <button type="button" data-command="show"><span class="glyph">◎</span><span>Show indicator</span></button>
+        <button type="button" data-command="hide"><span class="glyph">◌</span><span>Hide indicator</span></button>
+      </div>
+
+      <p id="toast" class="toast" role="status" aria-live="polite"></p>
+    </section>
+
+    <footer>
+      <span>Desktop and bridge run on the same machine or LAN.</span>
+      <span class="mono">/api/devices/{id}/commands</span>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

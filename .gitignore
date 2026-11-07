@@ -1,6 +1,14 @@
 # Build output
 AffectionIndicator/bin/
 AffectionIndicator/obj/
+BridgeServer/bin/
+BridgeServer/obj/
+WearController/build/
+WearController/app/build/
+WearController/.gradle/
+
+# Runtime bridge data (device hashes and tokens)
+BridgeServer/data/
 
 # Local development artifacts
 tmp/
@@ -9,5 +17,7 @@ tools/
 
 # IDE / user files
 .vs/
+.idea/
+WearController/local.properties
 *.user
 *.suo

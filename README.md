@@ -1,71 +1,149 @@
 # DetroitIndicator
 
-A desktop port of the **Detroit: Become Human** relationship gauge
-(`GLOBAL_GAUGE_BENDING`), built with C# and WPF.
+A complete desktop + bridge + Wear OS port of the **Detroit: Become Human**
+relationship gauge (`GLOBAL_GAUGE_BENDING`).
 
-The indicator is a transparent, always-on-top overlay with a tray app,
-an Apple-style settings window, auto-start, manual state previews, a localhost
-TCP control channel, and basic network-availability switching.
+The desktop is a transparent, always-on-top WPF overlay. On first launch it
+reads the motherboard serial, hashes it, and pairs with the bridge website to
+receive a 10-character device ID. It then keeps a WebSocket open and waits for
+commands from the bridge website or the Wear OS app.
 
-![Seven gauge states](AffectionIndicator/docs/states.png)
+| Bridge website | Desktops |
+| --- | --- |
+| ![Bridge website](docs/bridge.png) | ![Desktop bridge settings](docs/bridge-settings.png) |
+
+![Wear OS controller](docs/wear.png)
+
+## Components
+
+```
+AffectionIndicator/   WPF desktop overlay, tray app, settings, bridge client
+BridgeServer/         ASP.NET Core bridge website + WebSocket command relay
+WearController/       Wear OS controller app (Java, no AndroidX)
+indicator_demo/       browser reference implementation of the gauge
+docs/                 screenshots
+```
 
 ## Features
 
-- Transparent, click-through overlay with the seven source states.
-- Extracted padlock textures and source-derived triangle backdrop, accordion
-  plates, chevrons, big arrows, palette and 30 fps timing.
-- Tray menu: show/hide, state previews, settings, topmost, network auto-switch,
+### Desktop
+
+- Transparent, click-through overlay with all seven gauge states.
+- Extracted padlock textures, triangle backdrop, accordion plates, chevrons,
+  masked big arrows, source palette and 30 fps one-shot timing.
+- Tray menu: show/hide, preview states, settings, topmost, network auto-switch,
   live network status, exit.
-- Manual switching via preview buttons, tray, or TCP.
-- Auto-start through `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`.
-- Adjustable gauge position (anchors, offsets, scale, drag) and independent
-  horizontal/vertical **name position** controls in Appearance.
-- Localhost TCP control on `127.0.0.1:8765`.
+- Auto-start, manual switching, localhost TCP control.
+- Adjustable gauge position and independent name position.
+- **Bridge pairing**: first launch fingerprints the motherboard serial and
+  requests a device ID; the ID/token are persisted and the desktop reconnects
+  automatically on later launches.
+
+### Bridge
+
+- `POST /api/devices/register` is idempotent for a serial hash.
+- Desktop WebSocket channel at `/ws/device`.
+- Website with an ID field, online status, and gauge control buttons.
+- REST command endpoint used by the website and the watch.
+- JSON device store, basic LAN security, health endpoint.
+
+### Wear OS
+
+- Pairing setup for the bridge URL and device ID.
+- Online/offline status.
+- Small/big increase and decrease, unlock/lock, neutral, show/hide.
 
 ## Requirements
 
 - Windows 10/11 x64
 - [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0)
-- .NET 9 SDK to build
+  (SDK to build)
+- Android SDK 36 + JDK 17 to build the Wear app
+- Wear OS 3+ device or emulator to run the Wear app
 
-## Build and run
+## Run it
+
+### 1. Start the bridge
+
+```powershell
+dotnet run --project BridgeServer --urls http://0.0.0.0:5210
+```
+
+Open <http://localhost:5210> for the bridge website.
+
+For a physical watch on Wi-Fi, allow TCP 5210 on the private network and use
+the PC's LAN address in the watch app:
+
+```powershell
+New-NetFirewallRule -DisplayName "Affection Bridge" -Direction Inbound `
+  -Protocol TCP -LocalPort 5210 -Action Allow -Profile Private
+```
+
+### 2. Start the desktop
 
 ```powershell
 dotnet build AffectionIndicator.sln -c Release
 .\AffectionIndicator\bin\Release\net9.0-windows\win-x64\AffectionIndicator.exe
 ```
 
-Start with `--autostart` to launch the tray app without opening Settings.
+On first launch the app requests an ID. Open **Settings → Bridge** to see the
+ID and connection status. The default bridge URL is
+`http://localhost:5210`.
 
-## Repository layout
+### 3. Start the watch controller
+
+```powershell
+cd WearController
+$env:ANDROID_HOME = "D:\Android"
+.\gradlew.bat assembleDebug
+adb install -r app\build\outputs\apk\debug\app-debug.apk
+adb shell am start -n com.chidc.affectionwear/.MainActivity
+```
+
+- Emulator URL: `http://10.0.2.2:5210`
+- Physical watch URL: `http://<PC-LAN-IP>:5210`
+- Enter the ID shown in the desktop's **Settings → Bridge**, then **Save & check**.
+
+### 4. Or use the bridge website
+
+Open the website, enter the same device ID, and press **Connect**. The page
+shows **Desktop online** and enables the control buttons.
+
+## First-launch pairing flow
 
 ```
-AffectionIndicator/            WPF app, service layer, renderer, assets, README
-indicator_demo/                dependency-free browser reference implementation
-AFFECTION_INDICATOR_UI_REPORT.md  extraction and UI inventory notes
-AFFECTION_UI_INVENTORY.csv        supporting inventory data
-AffectionIndicator.sln
+motherboard serial
+      │  SHA-256
+      ▼
+POST /api/devices/register ──► 10-character ID + private token
+      │                              │
+      │ stored in settings.json      │ stored in bridge data
+      ▼                              ▼
+WebSocket /ws/device ◄──── commands from website/watch
 ```
 
-The app's detailed usage, TCP protocol, settings path, layout notes and
-limitations are documented in
-[`AffectionIndicator/README.md`](AffectionIndicator/README.md).
+The serial hash is only used to keep the pairing stable; the raw serial is not
+sent. Registration is idempotent, so a server restart or a reinstall returns
+the same ID for the same machine.
 
-## Controls
+## Documentation
 
-- Double-click the tray icon to open Settings.
-- Use **General → Manual preview** or the tray **Preview state** menu to show a
-  state.
-- Turn off **Click-through** on General, then drag the gauge to reposition it.
-- Use **Appearance → Name position** to move the character name independently.
+- Desktop usage, TCP protocol, layout notes and limitations:
+  [`AffectionIndicator/README.md`](AffectionIndicator/README.md)
+- Bridge API, networking and security:
+  [`BridgeServer/README.md`](BridgeServer/README.md)
+- Wear app build/install/use:
+  [`WearController/README.md`](WearController/README.md)
 
-## Notes
+## Notes and security
 
 This is a fan-made desktop experiment. Detroit: Become Human and its assets
 belong to Quantic Dream; this project is not affiliated with or endorsed by
-Quantic Dream. The extracted game data used during development is not included
-in this repository. Only the small gauge textures needed by the app and the
-reference viewer are included.
+Quantic Dream.
 
-Settings are stored at
-`%APPDATA%\AffectionIndicator\settings.json`.
+The bridge uses a random device ID for website/watch control and a private
+token for the desktop connection. There is no TLS, account system, or
+per-command authentication. Use it on a trusted LAN only; do not expose port
+5210 to the public internet.
+
+Settings are stored at `%APPDATA%\AffectionIndicator\settings.json`.

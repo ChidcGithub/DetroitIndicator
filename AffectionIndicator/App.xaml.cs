@@ -20,6 +20,7 @@ public partial class App : Application
     private SettingsService? _settingsService;
     private NetworkMonitor? _networkMonitor;
     private ControlServer? _controlServer;
+    private BridgeClientService? _bridge;
     private TrayService? _tray;
     private MainWindow? _overlay;
     private SettingsWindow? _settingsWindow;
@@ -65,6 +66,10 @@ public partial class App : Application
         _networkMonitor.StatusChanged += OnNetworkStatusChanged;
         _controlServer.CommandReceived += OnControlCommand;
 
+        _bridge = new BridgeClientService(_settingsService);
+        _bridge.CommandReceived += (_, command) => DispatchCommand(command);
+        _bridge.Start();
+
         _appliedServerEnabled = _settingsService.Settings.ControlServerEnabled;
         _appliedServerPort = _settingsService.Settings.ControlServerPort;
         if (_appliedServerEnabled)
@@ -86,6 +91,7 @@ public partial class App : Application
     private void OnSettingsChanged(object? sender, AppSettings settings)
     {
         _overlay?.ApplySettings(settings);
+        _bridge?.ApplySettings(settings);
         if (_controlServer == null)
             return;
 
@@ -112,13 +118,19 @@ public partial class App : Application
         }));
     }
 
-    private void OnControlCommand(object? sender, string command)
+    private void OnControlCommand(object? sender, string command) => DispatchCommand(command);
+
+    private void DispatchCommand(string command)
     {
-        Dispatcher.BeginInvoke(new Action(() =>
+        if (!Dispatcher.CheckAccess())
         {
-            var text = command.Trim();
-            switch (text.ToLowerInvariant())
-            {
+            Dispatcher.BeginInvoke(new Action(() => DispatchCommand(command)));
+            return;
+        }
+
+        var text = command.Trim();
+        switch (text.ToLowerInvariant())
+        {
                 case "inc":
                 case "increase":
                     Trigger(GaugeState.Increase);
@@ -178,7 +190,6 @@ public partial class App : Application
                     }
                     break;
             }
-        }));
     }
 
     private void Trigger(GaugeState state)
@@ -198,8 +209,11 @@ public partial class App : Application
 
     private void ShowSettings()
     {
-        if (_settingsService == null || _networkMonitor == null || _controlServer == null)
+        if (_settingsService == null || _networkMonitor == null ||
+            _controlServer == null || _bridge == null)
+        {
             return;
+        }
 
         if (_settingsWindow == null)
         {
@@ -207,6 +221,7 @@ public partial class App : Application
                 _settingsService,
                 _networkMonitor,
                 _controlServer,
+                _bridge,
                 Trigger,
                 () => _overlay?.IsVisible == true);
             _settingsWindow.Closed += (_, _) => _settingsWindow = null;
@@ -228,6 +243,7 @@ public partial class App : Application
             _tray?.Dispose();
             _controlServer?.Dispose();
             _networkMonitor?.Dispose();
+            _bridge?.Dispose();
             _singleInstance?.ReleaseMutex();
         }
         catch
@@ -245,6 +261,7 @@ public partial class App : Application
         _tray?.Dispose();
         _controlServer?.Dispose();
         _networkMonitor?.Dispose();
+        _bridge?.Dispose();
         _singleInstance?.Dispose();
         base.OnExit(e);
     }

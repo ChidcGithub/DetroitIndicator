@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using AffectionIndicator.Models;
 using AffectionIndicator.Rendering;
 using AffectionIndicator.Services;
@@ -11,6 +13,7 @@ public partial class SettingsWindow : Window
     private readonly SettingsService _settingsService;
     private readonly NetworkMonitor _networkMonitor;
     private readonly ControlServer _controlServer;
+    private readonly BridgeClientService _bridge;
     private readonly Action<GaugeState> _preview;
     private readonly Func<bool> _isOverlayVisible;
     private readonly System.Windows.Threading.DispatcherTimer _statusTimer;
@@ -23,6 +26,7 @@ public partial class SettingsWindow : Window
         SettingsService settingsService,
         NetworkMonitor networkMonitor,
         ControlServer controlServer,
+        BridgeClientService bridge,
         Action<GaugeState> preview,
         Func<bool> isOverlayVisible)
     {
@@ -30,10 +34,12 @@ public partial class SettingsWindow : Window
         _settingsService = settingsService;
         _networkMonitor = networkMonitor;
         _controlServer = controlServer;
+        _bridge = bridge;
         _preview = preview;
         _isOverlayVisible = isOverlayVisible;
 
         _networkMonitor.StatusChanged += OnNetworkStatusChanged;
+        _bridge.StatusChanged += OnBridgeStatusChanged;
         _settingsService.Changed += OnSettingsChanged;
         Closing += (_, e) =>
         {
@@ -56,6 +62,7 @@ public partial class SettingsWindow : Window
         LoadFromSettings(settingsService.Settings);
         UpdateNetworkStatus(_networkMonitor.IsOnline);
         UpdateServerStatus();
+        UpdateBridgeStatus(_bridge.Status);
         NavList.SelectedIndex = 0;
     }
 
@@ -78,6 +85,9 @@ public partial class SettingsWindow : Window
         NetworkAutoToggle.IsChecked = s.NetworkAutoSwitch;
         ServerToggle.IsChecked = s.ControlServerEnabled;
         PortBox.Text = s.ControlServerPort.ToString();
+        BridgeEnabledToggle.IsChecked = s.BridgeEnabled;
+        BridgeUrlBox.Text = s.BridgeUrl;
+        BridgeIdText.Text = string.IsNullOrWhiteSpace(s.BridgeDeviceId) ? "—" : s.BridgeDeviceId;
         NameBox.Text = s.Name;
         AdjectiveBox.Text = s.Adjective;
         OffsetXSlider.Value = s.OffsetX;
@@ -113,6 +123,11 @@ public partial class SettingsWindow : Window
                 ServerToggle.IsChecked = s.ControlServerEnabled;
             if (!PortBox.IsKeyboardFocusWithin)
                 PortBox.Text = s.ControlServerPort.ToString();
+            if (!BridgeEnabledToggle.IsKeyboardFocusWithin)
+                BridgeEnabledToggle.IsChecked = s.BridgeEnabled;
+            if (!BridgeUrlBox.IsKeyboardFocusWithin)
+                BridgeUrlBox.Text = s.BridgeUrl;
+            BridgeIdText.Text = string.IsNullOrWhiteSpace(s.BridgeDeviceId) ? "—" : s.BridgeDeviceId;
             if (!NameBox.IsKeyboardFocusWithin)
                 NameBox.Text = s.Name;
             if (!AdjectiveBox.IsKeyboardFocusWithin)
@@ -163,6 +178,7 @@ public partial class SettingsWindow : Window
         s.AutoStart = AutoStartToggle.IsChecked == true;
         s.NetworkAutoSwitch = NetworkAutoToggle.IsChecked == true;
         s.ControlServerEnabled = ServerToggle.IsChecked == true;
+        s.BridgeEnabled = BridgeEnabledToggle.IsChecked == true;
         if (int.TryParse(PortBox.Text, out var port))
             s.ControlServerPort = port;
         StartupService.SetEnabled(s.AutoStart);
@@ -318,6 +334,118 @@ public partial class SettingsWindow : Window
             : "Server stopped";
     }
 
+    private void BridgeUrl_OnLostFocus(object sender, RoutedEventArgs e)
+    {
+        if (_loading)
+            return;
+
+        var value = BridgeUrlBox.Text.Trim().TrimEnd('/');
+        if (!Uri.TryCreate(value, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+        {
+            BridgeUrlBox.Text = _settingsService.Settings.BridgeUrl;
+            return;
+        }
+
+        var s = _settingsService.Settings.Clone();
+        if (!string.Equals(s.BridgeUrl, value, StringComparison.OrdinalIgnoreCase))
+        {
+            s.BridgeUrl = value;
+            s.BridgeDeviceId = "";
+            s.BridgeToken = "";
+            _settingsService.Save(s);
+            BridgeIdText.Text = "—";
+            BridgeStatusText.Text = "Bridge URL changed; requesting a new ID…";
+            _bridge.ForceReconnect();
+        }
+
+        BridgeUrlBox.Text = _settingsService.Settings.BridgeUrl;
+    }
+
+    private void CopyBridgeId_OnClick(object sender, RoutedEventArgs e)
+    {
+        var id = _settingsService.Settings.BridgeDeviceId;
+        if (string.IsNullOrWhiteSpace(id))
+        {
+            BridgeStatusText.Text = "No device ID yet";
+            return;
+        }
+
+        try
+        {
+            Clipboard.SetText(id);
+            BridgeStatusText.Text = $"Copied {id}";
+        }
+        catch
+        {
+            BridgeStatusText.Text = "Could not copy the device ID";
+        }
+    }
+
+    private void OpenBridge_OnClick(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(_settingsService.Settings.BridgeUrl)
+            {
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // The URL is validated before it is saved; a failed browser launch is harmless.
+        }
+    }
+
+    private void ReconnectBridge_OnClick(object sender, RoutedEventArgs e)
+    {
+        BridgeStatusText.Text = "Reconnecting…";
+        _bridge.ForceReconnect();
+    }
+
+    private void ResetBridgePairing_OnClick(object sender, RoutedEventArgs e)
+    {
+        var s = _settingsService.Settings.Clone();
+        s.BridgeDeviceId = "";
+        s.BridgeToken = "";
+        _settingsService.Save(s);
+        BridgeIdText.Text = "—";
+        BridgeStatusText.Text = "Requesting a device ID…";
+        _bridge.ForceReconnect();
+    }
+
+    private void OnBridgeStatusChanged(object? sender, BridgeStatus status)
+    {
+        if (!Dispatcher.CheckAccess())
+        {
+            Dispatcher.BeginInvoke(new Action(() => UpdateBridgeStatus(status)));
+            return;
+        }
+
+        UpdateBridgeStatus(status);
+    }
+
+    private void UpdateBridgeStatus(BridgeStatus status)
+    {
+        BridgeStatusText.Text = status.Message;
+        var color = status.State switch
+        {
+            BridgeConnectionState.Connected => Color.FromRgb(0x34, 0xC7, 0x59),
+            BridgeConnectionState.Registering => Color.FromRgb(0xFF, 0xB3, 0x40),
+            BridgeConnectionState.Connecting => Color.FromRgb(0xFF, 0xB3, 0x40),
+            BridgeConnectionState.Starting => Color.FromRgb(0xFF, 0xB3, 0x40),
+            BridgeConnectionState.Reconnecting => Color.FromRgb(0xFF, 0x45, 0x3A),
+            BridgeConnectionState.WaitingForBridge => Color.FromRgb(0xFF, 0x45, 0x3A),
+            _ => Color.FromRgb(0x8E, 0x8E, 0x93)
+        };
+        BridgeStatusDot.Fill = new SolidColorBrush(color);
+
+        if (!string.IsNullOrWhiteSpace(status.DeviceId))
+            BridgeIdText.Text = status.DeviceId;
+        else if (string.IsNullOrWhiteSpace(_settingsService.Settings.BridgeDeviceId))
+            BridgeIdText.Text = "—";
+    }
+
     private void NavList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (GeneralPage == null)
@@ -326,6 +454,7 @@ public partial class SettingsWindow : Window
         GeneralPage.Visibility = NavList.SelectedIndex == 0 ? Visibility.Visible : Visibility.Collapsed;
         AppearancePage.Visibility = NavList.SelectedIndex == 1 ? Visibility.Visible : Visibility.Collapsed;
         NetworkPage.Visibility = NavList.SelectedIndex == 2 ? Visibility.Visible : Visibility.Collapsed;
-        AboutPage.Visibility = NavList.SelectedIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
+        BridgePage.Visibility = NavList.SelectedIndex == 3 ? Visibility.Visible : Visibility.Collapsed;
+        AboutPage.Visibility = NavList.SelectedIndex == 4 ? Visibility.Visible : Visibility.Collapsed;
     }
 }

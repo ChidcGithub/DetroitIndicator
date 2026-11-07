@@ -33,6 +33,11 @@ public sealed class AppSettings
     public string Name { get; set; } = "HANK";
     public string Adjective { get; set; } = "HOSTILE";
 
+    public bool BridgeEnabled { get; set; } = true;
+    public string BridgeUrl { get; set; } = "http://localhost:5210";
+    public string BridgeDeviceId { get; set; } = "";
+    public string BridgeToken { get; set; } = "";
+
     [JsonIgnore]
     public string AnchorLabel => Anchor switch
     {
@@ -57,5 +62,10 @@ public sealed class AppSettings
         NameOffsetY = Math.Clamp(NameOffsetY, -100, 100);
         Name = string.IsNullOrWhiteSpace(Name) ? "HANK" : Name.Trim();
         Adjective = string.IsNullOrWhiteSpace(Adjective) ? "HOSTILE" : Adjective.Trim();
+        BridgeUrl = string.IsNullOrWhiteSpace(BridgeUrl)
+            ? "http://localhost:5210"
+            : BridgeUrl.Trim().TrimEnd('/');
+        BridgeDeviceId = (BridgeDeviceId ?? "").Trim().ToUpperInvariant();
+        BridgeToken = (BridgeToken ?? "").Trim();
     }
 }

@@ -207,6 +207,7 @@
                     <ListBoxItem Content="General"/>
                     <ListBoxItem Content="Appearance"/>
                     <ListBoxItem Content="Network"/>
+                    <ListBoxItem Content="Bridge"/>
                     <ListBoxItem Content="About"/>
                 </ListBox>
 
@@ -412,6 +413,80 @@
                                 <TextBox x:Name="PortBox" Grid.Column="1" Width="100" Height="30" Padding="8,4" FontSize="13" LostFocus="Port_OnLostFocus"/>
                             </Grid>
                             <TextBlock x:Name="ServerStatusText" Text="Server stopped" Style="{StaticResource RowHint}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <StackPanel x:Name="BridgePage" Visibility="Collapsed">
+                    <TextBlock Text="Bridge" Style="{StaticResource Title}"/>
+                    <TextBlock Text="Pair this desktop with the bridge website and the Wear OS controller."
+                               Style="{StaticResource Subtitle}" Margin="0,0,0,20"/>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="PAIRING" Style="{StaticResource SectionTitle}"/>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse x:Name="BridgeStatusDot" Width="9" Height="9" Fill="#8E8E93"
+                                             VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBlock x:Name="BridgeStatusText" Text="Starting bridge…" Style="{StaticResource RowLabel}"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" Content="Reconnect" Style="{StaticResource SecondaryButton}"
+                                        Click="ReconnectBridge_OnClick"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Device ID" Style="{StaticResource RowLabel}"/>
+                                    <TextBlock Text="Enter this ID in the Wear OS app to control the gauge."
+                                               Style="{StaticResource RowHint}"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock x:Name="BridgeIdText" Text="—"
+                                               FontFamily="Cascadia Mono, Consolas" FontSize="20"
+                                               FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    <Button Content="Copy" Style="{StaticResource SecondaryButton}"
+                                            Margin="10,0,0,0" Click="CopyBridgeId_OnClick"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Bridge connection" Style="{StaticResource RowLabel}"/>
+                                <CheckBox x:Name="BridgeEnabledToggle" Grid.Column="1"
+                                          Style="{StaticResource Switch}"
+                                          Checked="SettingChanged" Unchecked="SettingChanged"/>
+                            </Grid>
+
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Bridge URL" Style="{StaticResource RowLabel}"/>
+                                <TextBox x:Name="BridgeUrlBox" Grid.Column="1" Width="300" Height="30"
+                                         Padding="8,4" FontSize="13" LostFocus="BridgeUrl_OnLostFocus"/>
+                            </Grid>
+
+                            <WrapPanel>
+                                <Button Content="Open bridge website" Style="{StaticResource SecondaryButton}"
+                                        Click="OpenBridge_OnClick"/>
+                                <Button Content="Reset pairing" Style="{StaticResource SecondaryButton}"
+                                        Margin="8,0,0,0" Click="ResetBridgePairing_OnClick"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="HOW IT WORKS" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="On first launch the desktop reads the motherboard serial, hashes it, and requests a device ID from the bridge. The ID and a private token are stored with the other settings. While connected, the desktop waits for commands from the bridge website or the Wear OS app."
+                                       TextWrapping="Wrap" FontSize="13" LineHeight="20"/>
+                            <TextBlock Text="Start the bridge with:  dotnet run --project BridgeServer --urls http://0.0.0.0:5210"
+                                       Margin="0,12,0,0" FontFamily="Cascadia Mono, Consolas" FontSize="12"
+                                       Foreground="{StaticResource MutedBrush}"/>
+                            <TextBlock Text="On a physical watch, use the PC's LAN address, for example http://192.168.1.20:5210. The Wear emulator uses http://10.0.2.2:5210."
+                                       Margin="0,6,0,0" TextWrapping="Wrap" FontSize="12"
+                                       Foreground="{StaticResource MutedBrush}"/>
                         </StackPanel>
                     </Border>
                 </StackPanel>
