@@ -34,7 +34,7 @@ docs/                 screenshots
 - Tray menu: show/hide, preview states, settings, topmost, network auto-switch,
   live network status, exit.
 - Auto-start, manual switching, localhost TCP control.
-- Adjustable gauge position and independent name position.
+- Adjustable gauge position and independent name/state-arrow positions.
 - **Bridge pairing**: first launch fingerprints the motherboard serial and
   requests a device ID; the ID/token are persisted and the desktop reconnects
   automatically on later launches.

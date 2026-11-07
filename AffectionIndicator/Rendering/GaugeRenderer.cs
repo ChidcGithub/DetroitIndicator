@@ -88,7 +88,9 @@ public sealed class GaugeRenderer
         double time,
         double pixelsPerDip,
         double nameOffsetX = 0,
-        double nameOffsetY = 0)
+        double nameOffsetY = 0,
+        double arrowOffsetX = 0,
+        double arrowOffsetY = 0)
     {
         if (time < 0)
             return;
@@ -108,11 +110,11 @@ public sealed class GaugeRenderer
         {
             case GaugeState.Increase:
             case GaugeState.Decrease:
-                DrawSmallChevron(dc, time, state, fade);
+                DrawSmallChevron(dc, time, state, fade, arrowOffsetX, arrowOffsetY);
                 break;
             case GaugeState.IncreasePlus:
             case GaugeState.DecreasePlus:
-                DrawBigArrow(dc, time, state, fade, pixelsPerDip);
+                DrawBigArrow(dc, time, state, fade, pixelsPerDip, arrowOffsetX, arrowOffsetY);
                 break;
             case GaugeState.Unlocked:
             case GaugeState.Locked:
@@ -258,7 +260,13 @@ public sealed class GaugeRenderer
         dc.Pop();
     }
 
-    private static void DrawSmallChevron(DrawingContext dc, double t, GaugeState state, double fade)
+    private static void DrawSmallChevron(
+        DrawingContext dc,
+        double t,
+        GaugeState state,
+        double fade,
+        double offsetX,
+        double offsetY)
     {
         var increase = state == GaugeState.Increase;
         double y;
@@ -275,11 +283,18 @@ public sealed class GaugeRenderer
             alpha = Math.Max(0, 1 - (t - 1) / 0.3);
         }
 
-        DrawChevron(dc, BendingX + 8, BendingY + y, increase ? 1 : -1,
+        DrawChevron(dc, BendingX + 8 + offsetX, BendingY + y + offsetY, increase ? 1 : -1,
             increase ? Blue : Red, alpha * fade);
     }
 
-    private static void DrawBigArrow(DrawingContext dc, double t, GaugeState state, double fade, double dpi)
+    private static void DrawBigArrow(
+        DrawingContext dc,
+        double t,
+        GaugeState state,
+        double fade,
+        double dpi,
+        double offsetX,
+        double offsetY)
     {
         var increase = state == GaugeState.IncreasePlus;
         var tm = Math.Min(t, 1.9);
@@ -309,11 +324,11 @@ public sealed class GaugeRenderer
 
         if (arrowAlpha > 0.001)
         {
-            var mask = ArrowGeometry(BendingX + 8, BendingY + maskY, sy);
+            var mask = ArrowGeometry(BendingX + 8 + offsetX, BendingY + maskY + offsetY, sy);
             dc.PushClip(mask);
             dc.PushOpacity(arrowAlpha);
             dc.DrawGeometry(Brush(increase ? Blue : Red, 1), null,
-                ArrowGeometry(BendingX + 8, BendingY + arrowY, sy));
+                ArrowGeometry(BendingX + 8 + offsetX, BendingY + arrowY + offsetY, sy));
             dc.Pop();
             dc.Pop();
         }
@@ -322,8 +337,8 @@ public sealed class GaugeRenderer
         {
             var p1 = Clamp01(tm - 1);
             var y = increase ? Lerp(24, -40, EaseOutQuint(p1)) : Lerp(-6, 64, EaseOutQuint(p1));
-            DrawChevron(dc, BendingX + 8, BendingY + y + BigArrowLift, increase ? 1 : -1,
-                increase ? Blue : Red, fade);
+            DrawChevron(dc, BendingX + 8 + offsetX, BendingY + y + BigArrowLift + offsetY,
+                increase ? 1 : -1, increase ? Blue : Red, fade);
         }
     }
 

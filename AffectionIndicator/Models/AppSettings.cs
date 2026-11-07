@@ -29,6 +29,8 @@ public sealed class AppSettings
 
     public double NameOffsetX { get; set; }
     public double NameOffsetY { get; set; }
+    public double ArrowOffsetX { get; set; }
+    public double ArrowOffsetY { get; set; }
 
     public string Name { get; set; } = "HANK";
     public string Adjective { get; set; } = "HOSTILE";
@@ -60,6 +62,8 @@ public sealed class AppSettings
         OffsetY = Math.Clamp(OffsetY, -4000, 4000);
         NameOffsetX = Math.Clamp(NameOffsetX, -300, 300);
         NameOffsetY = Math.Clamp(NameOffsetY, -100, 100);
+        ArrowOffsetX = Math.Clamp(ArrowOffsetX, -300, 300);
+        ArrowOffsetY = Math.Clamp(ArrowOffsetY, -100, 100);
         Name = string.IsNullOrWhiteSpace(Name) ? "HANK" : Name.Trim();
         Adjective = string.IsNullOrWhiteSpace(Adjective) ? "HOSTILE" : Adjective.Trim();
         BridgeUrl = string.IsNullOrWhiteSpace(BridgeUrl)

@@ -29,8 +29,9 @@ controllers.
 - **Basic network switching** – when connectivity comes online/offline the
   overlay shows an increase/decrease (optional).
 - **Positioning** – six anchors, custom offsets, 0.70–1.60× scale, or drag the
-  gauge directly while click-through is off. The character name has its own
-  horizontal/vertical offset controls in Appearance. Everything is persisted.
+  gauge directly while click-through is off. The character name and the
+  right-side state arrow have independent horizontal/vertical offset controls
+  in Appearance. Everything is persisted.
 - **Localhost control** – one command per line on `127.0.0.1:8765`.
 - **Bridge pairing** – on first launch, hashes the motherboard serial and
   requests a device ID from the bridge website, then keeps a WebSocket open for
@@ -69,8 +70,10 @@ The first launch opens Settings.
 - **Appearance** – anchor, horizontal/vertical offsets, scale, reset position.
   The **Name position** card moves the character name independently with
   horizontal/vertical sliders; **Preview name** shows the result and **Reset
-  name** restores the default. Turn off **Click-through** on General, then drag
-  the gauge directly. The new position is saved as a custom anchor.
+  name** restores the default. The **Arrow position** card does the same for
+  the state arrow to the right of the name. Turn off **Click-through** on
+  General, then drag the gauge directly. The new position is saved as a custom
+  anchor.
 - **Network** – live online/offline status, network auto-switch, TCP server
   toggle, port and listening status.
 - **Bridge** – pairing status, the device ID (with **Copy**), bridge URL,
@@ -164,6 +167,8 @@ The source viewer is preserved in `../indicator_demo/` (open
 - view box: `520 × 236` DIP at stage origin `(1446, −66)`
 - name base center at `x = 1732`, `y = 26` (40 px left of the source `1772`);
   further adjustable by `NameOffsetX/Y` from the Appearance page
+- state arrow at `x = BendingX + 8`, independently adjustable by
+  `ArrowOffsetX/Y`
 - adjective plate/padlock shifted `−40`
 - big arrow lifted `−20`
 - 10 px tracking, Bahnschrift Condensed

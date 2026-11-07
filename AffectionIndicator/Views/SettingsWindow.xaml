@@ -363,6 +363,34 @@
 
                     <Border Style="{StaticResource Card}">
                         <StackPanel>
+                            <TextBlock Text="ARROW POSITION" Style="{StaticResource SectionTitle}"/>
+                            <TextBlock Text="Move the state arrow to the right of the name independently."
+                                       Style="{StaticResource RowHint}" Margin="0,0,0,12"/>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Horizontal" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="ArrowOffsetXSlider" Style="{StaticResource SliderStyle}" Minimum="-300" Maximum="300" ValueChanged="ArrowOffset_OnValueChanged"/>
+                                    <TextBlock x:Name="ArrowOffsetXLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Vertical" Style="{StaticResource RowLabel}"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Slider x:Name="ArrowOffsetYSlider" Style="{StaticResource SliderStyle}" Minimum="-100" Maximum="100" ValueChanged="ArrowOffset_OnValueChanged"/>
+                                    <TextBlock x:Name="ArrowOffsetYLabel" Width="54" TextAlignment="Right" VerticalAlignment="Center" Foreground="{StaticResource MutedBrush}"/>
+                                </StackPanel>
+                            </Grid>
+                            <WrapPanel>
+                                <Button Content="Reset arrow" Style="{StaticResource SecondaryButton}" Click="ResetArrow_OnClick"/>
+                                <Button Content="Preview arrow" Style="{StaticResource PrimaryButton}" Margin="8,0,0,0" Click="PreviewArrow_OnClick"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
                             <TextBlock Text="TIP" Style="{StaticResource SectionTitle}"/>
                             <TextBlock Text="Turn off Click-through in General, then drag the gauge directly with the mouse. Its position is saved automatically."
                                        Style="{StaticResource RowHint}"/>

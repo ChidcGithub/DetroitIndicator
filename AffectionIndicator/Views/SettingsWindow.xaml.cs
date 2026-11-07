@@ -95,6 +95,8 @@ public partial class SettingsWindow : Window
         ScaleSlider.Value = s.Scale;
         NameOffsetXSlider.Value = s.NameOffsetX;
         NameOffsetYSlider.Value = s.NameOffsetY;
+        ArrowOffsetXSlider.Value = s.ArrowOffsetX;
+        ArrowOffsetYSlider.Value = s.ArrowOffsetY;
         SetAnchorSelection(s.Anchor);
         UpdateSliderLabels();
         _loading = false;
@@ -142,6 +144,10 @@ public partial class SettingsWindow : Window
                 NameOffsetXSlider.Value = s.NameOffsetX;
             if (!NameOffsetYSlider.IsKeyboardFocusWithin)
                 NameOffsetYSlider.Value = s.NameOffsetY;
+            if (!ArrowOffsetXSlider.IsKeyboardFocusWithin)
+                ArrowOffsetXSlider.Value = s.ArrowOffsetX;
+            if (!ArrowOffsetYSlider.IsKeyboardFocusWithin)
+                ArrowOffsetYSlider.Value = s.ArrowOffsetY;
             SetAnchorSelection(s.Anchor);
             UpdateSliderLabels();
         }
@@ -265,16 +271,30 @@ public partial class SettingsWindow : Window
         _settingsService.Save(s);
     }
 
+    private void ArrowOffset_OnValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        UpdateSliderLabels();
+        if (_loading)
+            return;
+        var s = _settingsService.Settings.Clone();
+        s.ArrowOffsetX = ArrowOffsetXSlider.Value;
+        s.ArrowOffsetY = ArrowOffsetYSlider.Value;
+        _settingsService.Save(s);
+    }
+
     private void UpdateSliderLabels()
     {
         if (OffsetXLabel == null || OffsetYLabel == null || ScaleLabel == null ||
-            NameOffsetXLabel == null || NameOffsetYLabel == null)
+            NameOffsetXLabel == null || NameOffsetYLabel == null ||
+            ArrowOffsetXLabel == null || ArrowOffsetYLabel == null)
             return;
         OffsetXLabel.Text = $"{OffsetXSlider.Value:0} px";
         OffsetYLabel.Text = $"{OffsetYSlider.Value:0} px";
         ScaleLabel.Text = $"{ScaleSlider.Value:0.00}×";
         NameOffsetXLabel.Text = $"{NameOffsetXSlider.Value:0} px";
         NameOffsetYLabel.Text = $"{NameOffsetYSlider.Value:0} px";
+        ArrowOffsetXLabel.Text = $"{ArrowOffsetXSlider.Value:0} px";
+        ArrowOffsetYLabel.Text = $"{ArrowOffsetYSlider.Value:0} px";
     }
 
     private void ResetPosition_OnClick(object sender, RoutedEventArgs e)
@@ -306,6 +326,26 @@ public partial class SettingsWindow : Window
     {
         _lastPreview = GaugeState.None;
         _preview(GaugeState.None);
+    }
+
+    private void ResetArrow_OnClick(object sender, RoutedEventArgs e)
+    {
+        var s = _settingsService.Settings.Clone();
+        s.ArrowOffsetX = 0;
+        s.ArrowOffsetY = 0;
+        _settingsService.Save(s);
+
+        _loading = true;
+        ArrowOffsetXSlider.Value = 0;
+        ArrowOffsetYSlider.Value = 0;
+        _loading = false;
+        UpdateSliderLabels();
+    }
+
+    private void PreviewArrow_OnClick(object sender, RoutedEventArgs e)
+    {
+        _lastPreview = GaugeState.IncreasePlus;
+        _preview(GaugeState.IncreasePlus);
     }
 
     private void RecheckNetwork_OnClick(object sender, RoutedEventArgs e)

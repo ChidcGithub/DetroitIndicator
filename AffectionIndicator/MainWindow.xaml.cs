@@ -40,6 +40,8 @@ public partial class MainWindow : Window
         Gauge.Scale = settings.Scale;
         Gauge.NameOffsetX = settings.NameOffsetX;
         Gauge.NameOffsetY = settings.NameOffsetY;
+        Gauge.ArrowOffsetX = settings.ArrowOffsetX;
+        Gauge.ArrowOffsetY = settings.ArrowOffsetY;
         Topmost = settings.AlwaysOnTop;
         PositionFromSettings(settings);
         ApplyWindowStyles();
