@@ -16,7 +16,7 @@ public sealed record RegisterRequest(string SerialHash, string? MachineName);
 
 public sealed record RegisterResponse(string DeviceId, string Token, bool IsNew);
 
-public sealed record CommandRequest(string Command);
+public sealed record CommandRequest(string Command, string? Name = null, string? Adjective = null);
 
 public sealed record DeviceStatusResponse(
     string DeviceId,

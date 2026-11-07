@@ -45,6 +45,11 @@ Allowed commands: `inc`, `increase`, `dec`, `decrease`, `inc+`, `increaseplus`,
 `biginc`, `dec+`, `decreaseplus`, `bigdec`, `unlock`, `unlocked`, `lock`,
 `locked`, `neutral`, `none`, `show`, `hide`, `state:-1..5`.
 
+The command request can also include optional `name` and `adjective` fields
+(up to 32 characters each). The bridge sends `name:...` and `adj:...` to the
+desktop before the state command, letting the Wear custom button or any API
+client send a complete custom state in one request.
+
 ### Register with PowerShell
 
 ```powershell
@@ -63,6 +68,15 @@ Invoke-RestMethod -Method Post -Uri http://localhost:5210/api/devices/register `
 Invoke-RestMethod -Method Post `
   -Uri http://localhost:5210/api/devices/<DEVICE_ID>/commands `
   -ContentType application/json -Body '{"command":"inc+"}'
+```
+
+Send a state with custom name/adjective (used by the Wear custom button):
+
+```powershell
+Invoke-RestMethod -Method Post `
+  -Uri http://localhost:5210/api/devices/<DEVICE_ID>/commands `
+  -ContentType application/json `
+  -Body '{"command":"inc","name":"TARA","adjective":"HAPPY"}'
 ```
 
 ## Data

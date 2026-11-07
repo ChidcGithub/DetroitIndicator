@@ -2,9 +2,15 @@ package com.chidc.affectionwear;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.io.ByteArrayOutputStream;
@@ -22,12 +28,29 @@ public class MainActivity extends Activity {
     private static final String PREFS = "affection_wear";
     private static final String KEY_ID = "device_id";
     private static final String KEY_URL = "bridge_url";
+    private static final String KEY_PRESET_NAME = "preset_name";
+    private static final String KEY_PRESET_ADJECTIVE = "preset_adjective";
+    private static final String KEY_PRESET_COMMAND = "preset_command";
+    private static final String KEY_PRESET_LABEL = "preset_label";
+    private static final String KEY_PRESET_STATE = "preset_state";
     private static final String DEFAULT_URL = "http://10.0.2.2:5210";
+
+    private static final String[] STATE_LABELS = {
+            "Small +", "Small \u2212", "Big +", "Big \u2212",
+            "Unlock", "Lock", "Name only"
+    };
+    private static final String[] STATE_COMMANDS = {
+            "inc", "dec", "inc+", "dec+", "unlock", "lock", "neutral"
+    };
 
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private EditText deviceId;
     private EditText bridgeUrl;
+    private EditText presetName;
+    private EditText presetAdjective;
+    private Spinner presetState;
+    private Button customButton;
     private TextView statusText;
 
     @Override
@@ -37,15 +60,29 @@ public class MainActivity extends Activity {
 
         deviceId = findViewById(R.id.device_id);
         bridgeUrl = findViewById(R.id.bridge_url);
+        presetName = findViewById(R.id.preset_name);
+        presetAdjective = findViewById(R.id.preset_adjective);
+        presetState = findViewById(R.id.preset_state);
+        customButton = findViewById(R.id.btn_custom);
         statusText = findViewById(R.id.status_text);
 
         SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
         deviceId.setText(prefs.getString(KEY_ID, ""));
         bridgeUrl.setText(prefs.getString(KEY_URL, DEFAULT_URL));
+        presetName.setText(prefs.getString(KEY_PRESET_NAME, ""));
+        presetAdjective.setText(prefs.getString(KEY_PRESET_ADJECTIVE, ""));
+        setupStateSpinner(prefs.getInt(KEY_PRESET_STATE, 0));
+        updateCustomButton();
 
         findViewById(R.id.btn_save).setOnClickListener(v -> {
             savePrefs();
             checkStatus();
+        });
+
+        findViewById(R.id.btn_save_preset).setOnClickListener(v -> savePreset());
+        customButton.setOnClickListener(v -> {
+            savePrefs();
+            sendPreset();
         });
 
         bind(R.id.btn_inc, "inc", "small increase");
@@ -131,19 +168,117 @@ public class MainActivity extends Activity {
         });
     }
 
+    private void setupStateSpinner(int selected) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                this, android.R.layout.simple_spinner_item, STATE_LABELS) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                TextView view = (TextView) super.getView(position, convertView, parent);
+                view.setTextColor(Color.WHITE);
+                view.setTextSize(12);
+                view.setPadding(0, 0, 0, 0);
+                return view;
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                TextView view = (TextView) super.getDropDownView(position, convertView, parent);
+                view.setTextColor(Color.WHITE);
+                view.setTextSize(13);
+                return view;
+            }
+        };
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        presetState.setAdapter(adapter);
+        if (selected < 0 || selected >= STATE_LABELS.length) {
+            selected = 0;
+        }
+        presetState.setSelection(selected);
+    }
+
+    private void savePreset() {
+        String name = presetName.getText().toString().trim().toUpperCase(Locale.ROOT);
+        String adjective = presetAdjective.getText().toString().trim().toUpperCase(Locale.ROOT);
+        if (name.isEmpty() || adjective.isEmpty()) {
+            setStatus("Enter a name and adjective");
+            return;
+        }
+
+        int index = presetState.getSelectedItemPosition();
+        if (index < 0 || index >= STATE_COMMANDS.length) {
+            index = 0;
+        }
+
+        presetName.setText(name);
+        presetAdjective.setText(adjective);
+        getSharedPreferences(PREFS, MODE_PRIVATE)
+                .edit()
+                .putString(KEY_PRESET_NAME, name)
+                .putString(KEY_PRESET_ADJECTIVE, adjective)
+                .putString(KEY_PRESET_COMMAND, STATE_COMMANDS[index])
+                .putString(KEY_PRESET_LABEL, STATE_LABELS[index])
+                .putInt(KEY_PRESET_STATE, index)
+                .apply();
+        updateCustomButton();
+        setStatus("Saved: " + name + " / " + adjective);
+    }
+
+    private void updateCustomButton() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        String name = prefs.getString(KEY_PRESET_NAME, "");
+        String adjective = prefs.getString(KEY_PRESET_ADJECTIVE, "");
+        String label = prefs.getString(KEY_PRESET_LABEL, "");
+        if (name.isEmpty() || adjective.isEmpty() || label.isEmpty()) {
+            customButton.setVisibility(View.GONE);
+            return;
+        }
+
+        customButton.setText(name + " / " + adjective + "\n" + label);
+        customButton.setVisibility(View.VISIBLE);
+    }
+
+    private void sendPreset() {
+        SharedPreferences prefs = getSharedPreferences(PREFS, MODE_PRIVATE);
+        String name = prefs.getString(KEY_PRESET_NAME, "");
+        String adjective = prefs.getString(KEY_PRESET_ADJECTIVE, "");
+        String command = prefs.getString(KEY_PRESET_COMMAND, "");
+        String label = prefs.getString(KEY_PRESET_LABEL, "");
+        if (name.isEmpty() || adjective.isEmpty() || command.isEmpty()) {
+            setStatus("Save a custom button first");
+            return;
+        }
+
+        sendCommand(command, name + " / " + adjective + " \u00b7 " + label, name, adjective);
+    }
+
     private void sendCommand(String command, String label) {
+        sendCommand(command, label, null, null);
+    }
+
+    private void sendCommand(String command, String label, String name, String adjective) {
         String id = currentId();
         if (id.isEmpty()) {
             setStatus("Enter the desktop ID first");
             return;
         }
 
+        StringBuilder body = new StringBuilder("{\"command\":\"")
+                .append(command)
+                .append("\"");
+        if (name != null && !name.isEmpty()) {
+            body.append(",\"name\":\"").append(jsonEscape(name)).append("\"");
+        }
+        if (adjective != null && !adjective.isEmpty()) {
+            body.append(",\"adjective\":\"").append(jsonEscape(adjective)).append("\"");
+        }
+        body.append("}");
+
         setStatus("Sending\u2026");
+        String payload = body.toString();
         executor.execute(() -> {
             try {
                 Result result = request("POST",
-                        "/api/devices/" + Uri.encode(id) + "/commands",
-                        "{\"command\":\"" + command + "\"}");
+                        "/api/devices/" + Uri.encode(id) + "/commands", payload);
                 if (result.code == 200 || result.code == 202) {
                     setStatus("Sent: " + label);
                 } else if (result.code == 409) {
@@ -157,6 +292,20 @@ public class MainActivity extends Activity {
                 setStatus("Bridge unreachable");
             }
         });
+    }
+
+    private static String jsonEscape(String value) {
+        StringBuilder escaped = new StringBuilder(value.length() + 8);
+        for (char c : value.toCharArray()) {
+            if (c == '\\') {
+                escaped.append("\\\\");
+            } else if (c == '"') {
+                escaped.append("\\\"");
+            } else if (c >= 0x20) {
+                escaped.append(c);
+            }
+        }
+        return escaped.toString();
     }
 
     private Result request(String method, String path, String body) throws IOException {

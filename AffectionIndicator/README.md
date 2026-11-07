@@ -114,6 +114,10 @@ The default URL is `http://localhost:5210`. A remote bridge can be used by
 changing **Bridge URL**; the app clears the old pairing and requests a new ID
 from that server. The WebSocket scheme is derived (`ws`/`wss`).
 
+Bridge command requests may include optional `name` and `adjective` fields;
+the bridge sends `name:...` and `adj:...` before the state. The Wear app uses
+this for its saved custom button.
+
 ## Localhost control protocol
 
 Enable **TCP control server** on the Network page, then connect to

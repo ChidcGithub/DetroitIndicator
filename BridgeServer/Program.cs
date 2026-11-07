@@ -67,13 +67,26 @@ app.MapPost("/api/devices/{deviceId}/commands",
         if (!hub.IsConnected(device.DeviceId))
             return Results.Conflict(new { error = "desktop is not connected" });
 
+        var name = CleanText(request.Name);
+        var adjective = CleanText(request.Adjective);
+
+        if (name != null && !await hub.SendAsync(device.DeviceId, "name:" + name))
+            return Results.Conflict(new { error = "desktop connection failed" });
+
+        if (adjective != null &&
+            !await hub.SendAsync(device.DeviceId, "adj:" + adjective))
+        {
+            return Results.Conflict(new { error = "desktop connection failed" });
+        }
+
         var sent = await hub.SendAsync(device.DeviceId, command);
         if (!sent)
             return Results.Conflict(new { error = "desktop connection failed" });
 
-        log.LogInformation("Command {Command} -> {DeviceId}", command, device.DeviceId);
+        log.LogInformation("Command {Command} name={Name} adj={Adjective} -> {DeviceId}",
+            command, name, adjective, device.DeviceId);
         return Results.Accepted($"/api/devices/{device.DeviceId}/status",
-            new { ok = true, command });
+            new { ok = true, command, name, adjective });
     });
 
 app.Map("/ws/device", async context =>
@@ -118,6 +131,17 @@ static bool IsSha256Hex(string value)
             return false;
     }
     return true;
+}
+
+static string? CleanText(string? value)
+{
+    if (string.IsNullOrWhiteSpace(value))
+        return null;
+
+    var text = new string(value.Trim().Where(c => !char.IsControl(c)).ToArray()).Trim();
+    if (text.Length == 0)
+        return null;
+    return text.Length > 32 ? text[..32] : text;
 }
 
 static bool IsAllowedCommand(string command)

@@ -52,6 +52,17 @@ docs/                 screenshots
 - Pairing setup for the bridge URL and device ID.
 - Online/offline status.
 - Small/big increase and decrease, unlock/lock, neutral, show/hide.
+- **Custom preset button**: save a name + adjective and a state, then send that
+  state with the saved text in one tap.
+
+The saved custom button and resulting desktop state:
+
+![Custom preset button](docs/custom-state.png)
+
+To create one, open the watch app, scroll to **Custom button**, enter a name
+and adjective, pick a state, and tap **Save custom button**. The saved button
+appears above the standard controls; tapping it sends the state and both text
+values together through the bridge.
 
 ## Requirements
 

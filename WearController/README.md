@@ -66,6 +66,24 @@ beyond a trusted LAN.
 The status line reports invalid IDs, an offline desktop, and bridge
 connection failures. `onResume` refreshes the online state.
 
+## Custom name/adjective button
+
+The **Custom button** card saves a name, an adjective, and a state. Tap
+**Save custom button** and a new button appears above the standard controls,
+for example:
+
+```
+TARA / HAPPY
+Small +
+```
+
+Tapping it posts one command with the state plus the saved name and adjective.
+The bridge forwards `name:...`, `adj:...`, and the state to the desktop, so the
+overlay shows that character's text immediately.
+
+The fields are pre-filled from the saved preset; editing and saving again
+replaces the custom button.
+
 ## Project layout
 
 ```
