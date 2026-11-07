@@ -21,3 +21,4 @@ tools/
 WearController/local.properties
 *.user
 *.suo
+WearController/.kotlin/

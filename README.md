@@ -19,7 +19,7 @@ commands from the bridge website or the Wear OS app.
 ```
 AffectionIndicator/   WPF desktop overlay, tray app, settings, bridge client
 BridgeServer/         ASP.NET Core bridge website + WebSocket command relay
-WearController/       Wear OS controller app (Java, no AndroidX)
+WearController/       Wear OS controller app (Kotlin, Compose Material 3 Expressive)
 indicator_demo/       browser reference implementation of the gauge
 docs/                 screenshots
 ```
@@ -49,29 +49,32 @@ docs/                 screenshots
 
 ### Wear OS
 
-- Pairing setup for the bridge URL and device ID.
-- Online/offline status.
+- **Material 3 Expressive** via Wear Compose Material3 `1.7.1` (latest stable).
+- **Nested menus**: Main → Gauge → Small / Big / Path / Visibility;
+  Custom buttons → editor → state picker; Pairing.
+- Online/offline status with dynamic color theming.
+- **Multiple saved custom buttons**: save a name + adjective + state, tap to
+  send them, and swipe a saved button left to reveal Delete. A full swipe or
+  tapping the Delete action removes it.
 - Small/big increase and decrease, unlock/lock, neutral, show/hide.
-- **Custom preset button**: save a name + adjective and a state, then send that
-  state with the saved text in one tap.
 
-The saved custom button and resulting desktop state:
+The resulting desktop state after sending a saved custom button:
 
-![Custom preset button](docs/custom-state.png)
+![Custom preset state](docs/custom-state.png)
 
-To create one, open the watch app, scroll to **Custom button**, enter a name
-and adjective, pick a state, and tap **Save custom button**. The saved button
-appears above the standard controls; tapping it sends the state and both text
-values together through the bridge. The custom name/adjective become the
-desktop's current name/adjective, so the overlay shows them and later states
-continue to use them until changed.
+To create one: **Custom buttons → New button**, enter a name and adjective,
+pick a state, and tap **Save button**. Saved buttons persist in the watch
+preferences. Tap a button to send its state and text; swipe left to delete it.
+The custom name/adjective become the desktop's current name/adjective, so the
+overlay shows them and later states continue to use them until changed.
 
 ## Requirements
 
 - Windows 10/11 x64
 - [.NET 9 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/9.0)
   (SDK to build)
-- Android SDK 36 + JDK 17 to build the Wear app
+- Android SDK 37 + JDK 17 to build the Wear app
+- Gradle 9.8.2 (the included wrapper downloads it)
 - Wear OS 3+ device or emulator to run the Wear app
 
 ## Run it
