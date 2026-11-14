@@ -22,3 +22,6 @@ WearController/local.properties
 *.user
 *.suo
 WearController/.kotlin/
+CloudflareBridge/node_modules/
+CloudflareBridge/.wrangler/
+CloudflareBridge/.dev.vars

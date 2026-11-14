@@ -19,6 +19,7 @@ commands from the bridge website or the Wear OS app.
 ```
 AffectionIndicator/   WPF desktop overlay, tray app, settings, bridge client
 BridgeServer/         ASP.NET Core bridge website + WebSocket command relay
+CloudflareBridge/     Cloudflare Workers deployment (Durable Objects + static website)
 WearController/       Wear OS controller app (Kotlin, Compose Material 3 Expressive)
 indicator_demo/       browser reference implementation of the gauge
 docs/                 screenshots
@@ -46,6 +47,8 @@ docs/                 screenshots
 - Website with an ID field, online status, and gauge control buttons.
 - REST command endpoint used by the website and the watch.
 - JSON device store, basic LAN security, health endpoint.
+- **Cloudflare Workers deployment** with Durable Objects, WebSocket
+  hibernation, and the same website/API.
 
 ### Wear OS
 
@@ -76,6 +79,7 @@ overlay shows them and later states continue to use them until changed.
 - Android SDK 37 + JDK 17 to build the Wear app
 - Gradle 9.8.2 (the included wrapper downloads it)
 - Wear OS 3+ device or emulator to run the Wear app
+- Node.js 20+ and npm for the Cloudflare bridge
 
 ## Run it
 
@@ -125,6 +129,26 @@ adb shell am start -n com.chidc.affectionwear/.MainActivity
 Open the website, enter the same device ID, and press **Connect**. The page
 shows **Desktop online** and enables the control buttons.
 
+### 5. Optional: run the bridge on Cloudflare
+
+The Cloudflare Worker implementation lives in `CloudflareBridge/` and exposes
+the same API and website using Durable Objects.
+
+```powershell
+cd CloudflareBridge
+npm install
+npx wrangler dev --port 8787
+```
+
+- Local Worker: <http://localhost:8787>; set the desktop Bridge URL to
+  `http://localhost:8787`.
+- Production: run `npx wrangler login` once, then `npx wrangler deploy`; set
+  the desktop and watch URLs to the printed
+  `https://affection-bridge.<subdomain>.workers.dev` URL.
+
+Deployment requires an authenticated Cloudflare account with Durable Objects
+available. See [`CloudflareBridge/README.md`](CloudflareBridge/README.md).
+
 ## First-launch pairing flow
 
 ```
@@ -148,6 +172,8 @@ the same ID for the same machine.
   [`AffectionIndicator/README.md`](AffectionIndicator/README.md)
 - Bridge API, networking and security:
   [`BridgeServer/README.md`](BridgeServer/README.md)
+- Cloudflare Workers deployment, local testing and Durable Objects:
+  [`CloudflareBridge/README.md`](CloudflareBridge/README.md)
 - Wear app build/install/use:
   [`WearController/README.md`](WearController/README.md)
 
